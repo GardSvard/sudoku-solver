@@ -51,10 +51,14 @@ fn main() -> Result<(), Box<dyn Error>>{
         let mut render = true;
         match handle_input(&mut ctx.events, &mut running) {
             Action::Move(x, y) => cursor_index = ((cursor_index.0 + x).clamp(0, 8), (cursor_index.1 + y).clamp(0, 8)),
-            Action::Solve => solving = !solving,
+            Action::Solve => {
+                if valid_board(&board) {
+                    solving = !solving;
+                }
+            },
             Action::Write(num) => board[cursor_index.1 as usize][cursor_index.0 as usize] = Tile::Hard(num),
             Action::Remove => board[cursor_index.1 as usize][cursor_index.0 as usize] = Tile::Empty,
-            Action::ToggleVisual => visual_solving = !visual_solving,
+            Action::ToggleVisual => visual_solving = dbg!(!visual_solving),
             Action::PrintBoard => { dbg!(&board); },
             Action::LoadTest => board = test_board(),
             Action::Nothing => render = false
@@ -281,7 +285,7 @@ fn render_number(number: u8, pos: (u32, u32), ctx: &mut SdlContext, font: &sdl2:
 
     let sdl2::render::TextureQuery { width, height, .. } = texture.query();
 
-    let target = Rect::new((pos.0 * TILE_SIZE + TILE_SIZE / 2 - width / 2) as i32, (pos.1 * TILE_SIZE + TILE_SIZE / 2 - height / 2) as i32, width, height);
+    let target = Rect::new((pos.0 * TILE_SIZE + TILE_SIZE / 2 - width / 2 + 1) as i32, (pos.1 * TILE_SIZE + TILE_SIZE / 2 - height / 2 + 2) as i32, width, height);
     let _ = ctx.canvas.copy(&texture, None, Some(target));
 }
 
